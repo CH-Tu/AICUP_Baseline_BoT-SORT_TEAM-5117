@@ -90,7 +90,7 @@ python tools/postprocessing.py \
 --percentage 5
 ```
 
-## Convert ground truth
+## Convert Ground Truth
 
 ```
 python tools/datasets/AICUP_to_MOT15.py \
