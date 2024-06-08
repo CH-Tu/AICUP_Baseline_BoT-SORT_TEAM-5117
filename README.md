@@ -19,15 +19,6 @@ pip install imageio[ffmpeg]
 cd BOT_SORT_PATH
 ```
 
-## Prepare ReID Dataset
-
-```
-python fast_reid/datasets/generate_AICUP_patches.py \
---data_path AI_CUP_PATH \
---save_path REID_PATH \
---train_ratio 1
-```
-
 ## Prepare YOLOv7 Dataset
 
 ```
@@ -35,6 +26,15 @@ python yolov7/tools/AICUP_to_YOLOv7.py \
 --AICUP_dir AI_CUP_PATH \
 --YOLOv7_dir YOLO_PATH \
 --train_ratio 0.9
+```
+
+## Prepare ReID Dataset
+
+```
+python fast_reid/datasets/generate_AICUP_patches.py \
+--data_path AI_CUP_PATH \
+--save_path REID_PATH \
+--train_ratio 1
 ```
 
 ## Train YOLOv7
