@@ -72,6 +72,7 @@ def main():
                         dists.append(dists_temp.min())
                     buffer_indices = sorted(range(len(dists)), key=lambda i: dists[i])
 
+                    new_ids = []
                     for line_index, buffer_index in zip(line_indices, buffer_indices):
                         try:
                             new_line = lines[line_index]
@@ -88,12 +89,13 @@ def main():
                             count = 0
                             bbox_center = bbox_centers[line_index]
                             bbox_area = bbox_areas[line_index]
-                            id_buffer.append({
+                            new_ids.append({
                                 'track_id': track_id,
                                 'count': count,
                                 'bbox_center': bbox_center,
                                 'bbox_area': bbox_area
                             })
+                    id_buffer = id_buffer + new_ids
 
             if len(id_buffer) != 0:
                 del_index = []
