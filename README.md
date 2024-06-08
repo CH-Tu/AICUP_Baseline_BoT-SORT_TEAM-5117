@@ -16,6 +16,7 @@ pip install -r requirements.txt
 pip install cython; pip3 install git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI
 pip install cython_bbox
 pip install faiss-gpu
+pip install imageio[ffmpeg]
 
 cd BOT_SORT_PATH
 ```
@@ -103,5 +104,21 @@ python tools/datasets/AICUP_to_MOT15.py \
 ```
 python tools/evaluate.py \
 --gt_dir MOT15_PATH \
+--ts_dir runs/track/sbs_S101/train/txts
+
+python tools/evaluate.py \
+--gt_dir MOT15_PATH \
 --ts_dir runs/track/sbs_S101/train/txts_postprocessing
+```
+
+## Output Video
+
+```
+python tools/txt_to_video.py \
+--image_path AI_CUP_PATH/images \
+--txt_path runs/track/sbs_S101/train/txts
+
+python tools/txt_to_video.py \
+--image_path AI_CUP_PATH/images \
+--txt_path runs/track/sbs_S101/train/txts_postprocessing
 ```
