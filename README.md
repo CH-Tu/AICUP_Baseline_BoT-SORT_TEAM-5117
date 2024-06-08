@@ -4,8 +4,6 @@ The code is based on [AICUP Baseline: BoT-SORT](https://github.com/ricky-696/AIC
 
 ## Installation
 
-The Installation is same as the baseline.
-
 ```
 conda create -n botsort python=3.7
 conda activate botsort
@@ -82,7 +80,7 @@ bash tools/track_all_timestamps.sh \
 python tools/data_sorting.py --output_path runs/track/sbs_S101/train
 ```
 
-## Postprocessing
+## Postprocess
 
 ```
 python tools/postprocessing.py \
