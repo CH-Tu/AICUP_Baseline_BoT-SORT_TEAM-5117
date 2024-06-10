@@ -39,19 +39,15 @@ def main():
         new_lines = list(lines)
         id_buffer = []
         for frame_id in frame_ids:
-            count_one_lines = [line
-                for line in lines
-                    if line.split(',')[0] == frame_id and line.split(',')[1] in counts_one.keys()
-            ]
-            line_indices = [index
+            count_one_line_indices = [index
                 for index, line in enumerate(lines)
                     if line.split(',')[0] == frame_id and line.split(',')[1] in counts_one.keys()
             ]
 
-            if len(count_one_lines) != 0:
+            if len(count_one_line_indices) != 0:
                 if len(id_buffer) == 0:
-                    for index, line in zip(line_indices, count_one_lines):
-                        track_id = line.split(',')[1]
+                    for index in count_one_line_indices:
+                        track_id = lines[index].split(',')[1]
                         count = 0
                         bbox_center = bbox_centers[index]
                         bbox_area = bbox_areas[index]
@@ -62,44 +58,51 @@ def main():
                             'bbox_area': bbox_area
                         })
                 else:
-                    dists = []
-                    for index in line_indices:
+                    dist_dicts = []
+                    for index in count_one_line_indices:
                         bbox_center = bbox_centers[index]
-                        dists_temp = np.array([])
-                        for bbox_center_temp in [temp['bbox_center'] for temp in id_buffer]:
-                            dist = ((bbox_center - bbox_center_temp) ** 2).sum() ** (1/2)
-                            dists_temp = np.append(dists_temp, dist)
-                        dists.append(dists_temp.min())
-                    buffer_indices = sorted(range(len(dists)), key=lambda i: dists[i])
+                        dist_dict = {}
+                        for temp in id_buffer:
+                            track_id = temp['track_id']
+                            dist = ((bbox_center - temp['bbox_center']) ** 2).sum() ** (1/2)
+                            dist_dict = {**dist_dict, track_id: dist}
+                        dist_dicts.append(dist_dict)
+                    priority = sorted(range(len(dist_dicts)), key=lambda i: min(dist_dicts[i].values()))
 
-                    new_ids = []
-                    for line_index, buffer_index in zip(line_indices, buffer_indices):
-                        try:
-                            new_line = lines[line_index]
-                            parts = new_line.split(',')
-                            parts[1] = id_buffer[buffer_index]['track_id']
-                            new_lines[line_index] = ','.join(parts)
-                            id_buffer[buffer_index]['count'] += 1
-                            id_buffer[buffer_index]['bbox_center'] = bbox_centers[line_index]
-                            id_buffer[buffer_index]['bbox_area'] = bbox_areas[line_index]
-                        except IndexError:
+                    track_ids_in_buffer = [temp['track_id'] for temp in id_buffer]
+                    for i in priority:
+                        line_index = count_one_line_indices[i]
+                        if len(track_ids_in_buffer) != 0:
+                            for track_id, dist in sorted(dist_dicts[i].items(), key=lambda item: item[1]):
+                                if track_id in track_ids_in_buffer:
+                                    new_line = lines[line_index]
+                                    parts = new_line.split(',')
+                                    parts[1] = track_id
+                                    new_lines[line_index] = ','.join(parts)
+                                    buffer_index = track_ids_in_buffer.index(track_id)
+                                    id_buffer[buffer_index]['bbox_center'] = bbox_centers[line_index]
+                                    id_buffer[buffer_index]['bbox_area'] = bbox_areas[line_index]
+                                    del track_ids_in_buffer[buffer_index]
+                                    break
+                        else:
                             new_line = lines[line_index]
                             parts = new_line.split(',')
                             track_id = parts[1]
                             count = 0
                             bbox_center = bbox_centers[line_index]
                             bbox_area = bbox_areas[line_index]
-                            new_ids.append({
+                            id_buffer.append({
                                 'track_id': track_id,
                                 'count': count,
                                 'bbox_center': bbox_center,
                                 'bbox_area': bbox_area
                             })
-                    id_buffer = id_buffer + new_ids
 
             if len(id_buffer) != 0:
                 del_index = []
                 for i, temp in enumerate(id_buffer):
+                    temp['count'] += 1
+
                     if (temp['count'] > count_threshold or
                         any(temp['bbox_center'] < bbox_center_min_threshold) or
                         any(temp['bbox_center'] > bbox_center_max_threshold) or
