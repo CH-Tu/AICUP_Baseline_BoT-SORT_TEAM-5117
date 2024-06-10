@@ -40,7 +40,7 @@ def main():
             frame_ids = [line.split(',')[0] for line in lines]
             track_ids = [line.split(',')[1] for line in lines]
             bboxes = np.array([line.split(',')[2:6] for line in lines]).astype(float) # [x0, y0, w, h]
-            bboxes[:, 2:] = bboxes[:, :2] + bboxes[:, 2:]                                # [x0, y0, x1, y1]
+            bboxes[:, 2:] = bboxes[:, :2] + bboxes[:, 2:]                             # [x0, y0, x1, y1]
 
             colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(100)]
             dir_name = os.path.splitext(file)[0]
